@@ -1,1 +1,40 @@
 @import '~node_modules/modern-normalize/modern-normalize.css';
+
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px;
+}
+
+.search-form {
+    position: relative;
+    background-color: rgba(57, 50, 104, 0.904); 
+    padding-top: 15px; 
+    padding-bottom: 15px; 
+    text-align: center;
+}
+
+input {
+    border-radius: 4px;
+}
+
+.icon {
+    position: absolute;
+    top: 17px;
+    left: 710px;
+    display: inline-block;
+    width: 26px;
+    height: 20px;
+    stroke-width: 0;
+    stroke: currentColor;
+    fill: currentColor;
+    padding: 5px;
+    border-radius: 3px;
+    //background-color: rgba(132, 146, 146, 0.349);
+  }
+  .icon:hover {
+    background-color: rgba(132, 146, 146, 0.452);
+  }
+  
