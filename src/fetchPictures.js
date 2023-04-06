@@ -5,12 +5,11 @@ const BASE_URL = 'https://pixabay.com/api/';
 
 export const fetchPictures = (name, pageNumber) => {
      
-    return fetch(`${BASE_URL}?key=${API_KEY}&q=${name}&image_type=photo&orientation=horizontal&safesearch=true&page=${pageNumber}&per_page=9`)
+    return fetch(`${BASE_URL}?key=${API_KEY}&q=${name}&image_type=photo&orientation=horizontal&safesearch=true&page=${pageNumber}&per_page=4`)
         .then(response => {
             if(!response.ok) {
                 throw new Error (response.status);
             }
-            console.log("in fetch", pageNumber);
             return response.json();  
         });
 }

@@ -12,14 +12,20 @@
     <!-- ❗️❗️❗️ Add partials like so for every page -->
 
     <form class="search-form" id="search-form">
-      <input
-        type="text"
-        name="searchQuery"
-        autocomplete="off"
-        placeholder="Search images..."
-      />
-      <svg aria-lable="dandruff" class="icon icon-search"><use xlink:href="#icon-search"></use></svg>
-      <!-- <button type="submit">Search</button> -->
+      <span class="inputAndImageWrapper">
+        <input
+          type="text"
+          name="searchQuery"
+          autocomplete="off"
+          placeholder="Search images..."
+        />
+        <button type="submit" class="search-btn">
+          <svg aria-lable="dandruff" class="icon icon-search">
+            <use xlink:href="#icon-search">
+            </use>
+          </svg>
+        </button>
+    </span>
     </form>
 
     <div class="gallery">
