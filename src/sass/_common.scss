@@ -37,18 +37,12 @@ input:hover, input:focus {
     -webkit-transform: translateY(-50%);
             transform: translateY(-50%);
     display: inline-block;
-    width: 30px;
-    height: 26px;
-    stroke-width: 0;
-    stroke: currentColor;
-    fill: currentColor;
-    padding: 6px;
+    padding: 7px;
     border-radius: 3px;
     background-color: rgba(132, 146, 146, 0.349);
 }
 
 .icon-search:hover, .icon-search:focus {
-    fill: rgb(29, 29, 223);
     background-color: rgba(116, 151, 151, 0.534);
 }
   
