@@ -14,7 +14,7 @@ export const fetchPictures = async (name, pageNumber) => {
             orientation: 'horizontal',
             safesearch: true,
             page: pageNumber,
-            per_page: 4,
+            per_page: 40,
         },
     });
     } catch(error) {

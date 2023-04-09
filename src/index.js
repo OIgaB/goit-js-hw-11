@@ -1,19 +1,20 @@
 "use strict";
 import { Notify } from 'notiflix/build/notiflix-notify-aio';  // бібліотека вспливаючих сповіщень
-import SimpleLightbox from "simplelightbox";                 // бібліотека для галереї
+import SimpleLightbox from 'simplelightbox';                 // бібліотека для галереї
 import "simplelightbox/dist/simple-lightbox.min.css";       // бібліотеки для галереї (стилізація)
 import {fetchPictures} from './fetchPictures';             // проміс (дані з бекенду/API) 
 import galleryCardTemplate from './gallery.hbs';          // шаблонізатор (handlebar)
 
 const searchForm = document.querySelector('#search-form');    // <form>
 const galleryContainer = document.querySelector('.gallery'); // <div>
-const loadMoreBtn = document.querySelector('.load-more');   // <button>
+//const loadMoreBtn = document.querySelector('.load-more');   // <button>
+const sentinel = document.querySelector('.sentinel');      // <div> - target
 
 let searchQuery = '';
 let pageNumber = null;
 let lightbox = null;
 
-loadMoreBtn.style.display = "none";
+//loadMoreBtn.style.display = "none";
 
 
 // Відправка запиту/форми
@@ -22,6 +23,10 @@ searchForm.addEventListener('submit', handleFormSubmit);
 async function handleFormSubmit (event) {
     event.preventDefault();
     searchQuery = event.currentTarget.elements.searchQuery.value.trim();
+    if (searchQuery === '') {
+        Notify.failure('Enter a search query.');
+        return;
+    }
     galleryContainer.innerHTML = "";  //Для пошуку за новим ключовим словом, очищуємо вміст галереї
     pageNumber = 1;
 
@@ -33,7 +38,7 @@ async function handleFormSubmit (event) {
             //console.log(data.hits); // масив об'єктів
             if(data.hits.length === 0) {  // або (!data.hits.length)
                 Notify.failure('Sorry, there are no images matching your search query. Please try again.');
-                loadMoreBtn.style.display = "none";
+                //loadMoreBtn.style.display = "none";
                 return;
             } 
             Notify.success(`Hooray! We found ${data.totalHits} images.`);
@@ -46,8 +51,8 @@ async function handleFormSubmit (event) {
                 captionSelector: 'img', 
             });  
 
-            loadMoreBtn.addEventListener('click', handleLoadMoreBtnClick); //  клік по кнопці "Load More"
-            loadMoreBtn.style.display = "block";
+            //loadMoreBtn.addEventListener('click', handleLoadMoreBtnClick); //  клік по кнопці "Load More"
+            //loadMoreBtn.style.display = "block";
 
     } catch(err) {
         console.log(err);
@@ -56,24 +61,58 @@ async function handleFormSubmit (event) {
 
 // Обробник події кліку на кнопку "Load More"
 
-async function handleLoadMoreBtnClick () {   
-    pageNumber += 1;
-    try {
-        const {data} = await fetchPictures(searchQuery, pageNumber);
-    // fetchPictures(searchQuery, pageNumber)
-        // .then(({data}) => {  // ({data}) замість (data) - у випадку застосування бібліотеки axios
-            renderMarkup(data.hits);  // Рендер розмітки
-            styleGallery();  // Стилізація галереї  
-            lightbox.refresh(); // рефрешим бібліотеку SimpleLightbox
+// async function handleLoadMoreBtnClick () {   
+//     pageNumber += 1;
+//     try {
+//         const {data} = await fetchPictures(searchQuery, pageNumber); - альтернативний запис 2-м рядкам нижче
 
-            if(pageNumber > Math.ceil(data.totalHits / 4)) {
-                Notify.failure("We're sorry, but you've reached the end of search results."); 
-                loadMoreBtn.style.display = "none";
+//     // fetchPictures(searchQuery, pageNumber)
+//         // .then(({data}) => {  // ({data}) замість (data) - у випадку застосування бібліотеки axios
+
+//             renderMarkup(data.hits);  // Рендер розмітки
+//             styleGallery();  // Стилізація галереї  
+//             lightbox.refresh(); // рефрешим бібліотеку SimpleLightbox
+
+//             if(pageNumber > Math.ceil(data.totalHits / 40)) {
+//                 Notify.failure("We're sorry, but you've reached the end of search results."); 
+//                 loadMoreBtn.style.display = "none";
+//             }
+//         } catch(err) {
+//             console.log(err);
+//         }
+// }
+
+
+// Нескінченний скрол
+
+const onEntry = async entries => {
+    try {
+         const {data} = await fetchPictures(searchQuery, pageNumber); 
+         entries.forEach(entry => {
+            if(entry.isIntersecting && searchQuery !== '') {
+                pageNumber += 1;
+                renderMarkup(data.hits);  // Рендер розмітки
+                styleGallery();  // Стилізація галереї  
+                lightbox.refresh(); // рефрешим бібліотеку SimpleLightbox
+
+                if((pageNumber > Math.ceil(data.totalHits / 8)) && entry.isIntersecting) {
+                    Notify.failure("We're sorry, but you've reached the end of search results."); 
+                }
             }
-        } catch(err) {
-            console.log(err);
-        }
+        })
+    } catch(err) {
+        console.log(err);
+    }
 }
+
+const observer = new IntersectionObserver (onEntry, {  //регистрация наблюдателя пересечений 
+    rootMargin: '150px', // observer реєструватиме перетин раніше на 150px
+});
+
+observer.observe(sentinel);
+
+
+
 
 // Рендер розмітки
 function renderMarkup(data) {
@@ -87,7 +126,7 @@ function styleGallery() {
         imageCard.style.cssText = "width: calc((100% - 50px) / 4);";
     })    
 
-    const galleryImgEls = document.querySelectorAll('img'); // зображення
+    const galleryImgEls = document.querySelectorAll('a img'); // зображення
     galleryImgEls.forEach(el => {
         el.style.cssText = "width: 100%; height: 73%; object-fit: cover;";
     });
